@@ -58,21 +58,37 @@ while True:
             print("Login successful!")
             break
     elif option == "2":
-        print("------------------USER REGISTER------------------")
-        email = input("Insert email: ")
-        name = input("Insert name: ")
-        password = input("Insert password: ")
+        print("------------------ADD MUSIC TO PLAYLIST------------------")
 
-        current_user = User(name, email, password)
+        playlist_name = input("Insert playlist name: ")
+        cur.execute(
+            f"SELECT * FROM playlist WHERE nome_playlist = '{playlist_name}' AND email_usuario = '{current_user.email}'")
+        selected_playlist = cur.fetchone()
 
-        cur.execute(f"SELECT * FROM usuario WHERE email_usuario = '{email}'")
-        if cur.fetchone() is not None:
-            print("Email already registered!")
-        else:
-            cur.execute(f"INSERT INTO usuario VALUES {current_user.sql_format()}")
+        if selected_playlist is None:
+            print("Playlist not found!")
+            continue
+
+        music_index = 1
+        while music_index >= 0:
+            musics = query.musics_not_in_playlist(cur, selected_playlist[0])
+            print("Avaialable musics: ")
+            print("Index - Music name | Album name | Artist name")
+            print("-1 - Done")
+            for i, music in enumerate(musics):
+                print(f"{i} - {music[1]} | {music[2]} | {music[3]}")
+
+            music_index = int(input("Insert music index: "))
+            if music_index < -1 or music_index >= len(musics):
+                print("Invalid index!")
+                continue
+            elif music_index == -1:
+                print("Done!")
+                break
+
+            cur.execute(f"INSERT INTO playlist_musica VALUES({musics[music_index][0]}, {selected_playlist[0]})")
             conn.commit()
-            print("Register successful!")
-            break
+            print("Music added successfully!")
     elif option == "3":
         exit()
     else:
