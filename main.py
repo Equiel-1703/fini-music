@@ -120,3 +120,5 @@ while True:
         print(f"------------------{current_user.name}'s PLAYLISTS------------------")
         query.show_playlists_musics(cur, current_user)
 
+    elif option == "6":
+        exit()
