@@ -121,12 +121,7 @@ def show_playlists_musics(cur, current_user):
     user_playlists = cur.fetchall()
 
     for playlist in user_playlists:
-        cur.execute(f"SELECT nome_musica, nome_album, nome_artista FROM musica "
-                    f"NATURAL JOIN album "
-                    f"NATURAL JOIN artista "
-                    f"NATURAL JOIN playlist_musica "
-                    f"WHERE id_playlist = {playlist[0]}")
-        playlist_musics = cur.fetchall()
+        playlist_musics = musics_in_playlist(cur, playlist[0])
 
         cur.execute(f"SELECT SUM(duracao) FROM playlist "
                     f"NATURAL JOIN playlist_musica "
