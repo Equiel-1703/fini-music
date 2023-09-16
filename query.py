@@ -7,7 +7,6 @@ def create_playlist(cur, conn, current_user):
         print("Playlist already exists!")
     else:
         cur.execute(f"INSERT INTO playlist (nome_playlist, email_usuario) VALUES ('{name}', '{current_user.email}')")
-        print("Ferrao gay")
         conn.commit()
 
 
