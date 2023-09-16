@@ -31,7 +31,7 @@ def add_music_playlist(cur, conn, current_user):
 
     music_index = 1
     while music_index >= 0:
-        musics = query.musics_not_in_playlist(cur, selected_playlist[0])
+        musics = musics_not_in_playlist(cur, selected_playlist[0])
         print("Avaialable musics: ")
         print("Index - Music name | Album name | Artist name")
         print("-1 - Done")
