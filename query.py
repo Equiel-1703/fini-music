@@ -88,3 +88,24 @@ def remove_music_playlist(cur, conn, current_user):
         cur.execute(
             f"DELETE FROM playlist_musica WHERE id_musica = {musics[music_index][0]} AND id_playlist = {selected_playlist[0]}")
         conn.commit()
+        print("Music added successfully!")
+
+def show_playlists_musics(cur, current_user):
+    cur.execute(f"SELECT id_playlist, nome_playlist FROM playlist "
+                f"WHERE email_usuario = '{current_user.email}'")
+
+    user_playlists = cur.fetchall()
+
+
+    for playlist in user_playlists:
+        print(f"Playlist: {playlist[1]}")
+        cur.execute(f"SELECT nome_musica, nome_album, nome_artista FROM musica "
+                    f"NATURAL JOIN album "
+                    f"NATURAL JOIN artista "
+                    f"NATURAL JOIN playlist_musica "
+                    f"WHERE id_playlist = {playlist[0]}")
+        musics = cur.fetchall()
+        for music in musics:
+            print(f"Music: {music[0]} | Album: {music[1]} | Artist: {music[2]}")
+        print("\n")
+
