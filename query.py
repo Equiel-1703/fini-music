@@ -88,7 +88,26 @@ def remove_music_playlist(cur, conn, current_user):
         cur.execute(
             f"DELETE FROM playlist_musica WHERE id_musica = {musics[music_index][0]} AND id_playlist = {selected_playlist[0]}")
         conn.commit()
-        print("Music added successfully!")
+        print("Music removed successfully!")
+
+
+def delete_playlist(cur, conn, current_user):
+    # Call method to display all playlists
+    # UNDER CONSTRUCTION BY Ferrao
+    playlist_name = input("Insert playlist name: ")
+    cur.execute(
+        f"SELECT * FROM playlist WHERE nome_playlist = '{playlist_name}' AND email_usuario = '{current_user.email}'")
+    selected_playlist = cur.fetchone()
+
+    if selected_playlist is None:
+        print("Playlist not found!")
+        return
+
+    cur.execute(f"DELETE FROM playlist_musica WHERE id_playlist = {selected_playlist[0]}")
+    cur.execute(f"DELETE FROM playlist WHERE id_playlist = {selected_playlist[0]}")
+    conn.commit()
+    print("Playlist deleted successfully!")
+
 
 def show_playlists_musics(cur, current_user):
     cur.execute(f"SELECT id_playlist, nome_playlist FROM playlist "
