@@ -105,3 +105,8 @@ while True:
         print("------------------ADD MUSIC TO PLAYLIST------------------")
         query.add_music_playlist(cur, conn, current_user)
         print("Music added successfully!")
+
+    elif option == "3":
+        print("------------------REMOVE MUSIC FROM PLAYLIST------------------")
+        query.remove_music_playlist(cur, conn, current_user)
+        print("Music removed successfully!")
