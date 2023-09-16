@@ -93,7 +93,6 @@ def remove_music_playlist(cur, conn, current_user):
         cur.execute(
             f"DELETE FROM playlist_musica WHERE id_musica = {musics[music_index][0]} AND id_playlist = {selected_playlist[0]}")
         conn.commit()
-        print("Music added successfully!")
         print("Music removed successfully!")
 
 
@@ -122,19 +121,25 @@ def show_playlists_musics(cur, current_user):
     user_playlists = cur.fetchall()
 
     for playlist in user_playlists:
-        cur.execute(f"SELECT nome_musica, nome_album, nome_artista, SUM(duracao) FROM musica "
+        cur.execute(f"SELECT nome_musica, nome_album, nome_artista FROM musica "
                     f"NATURAL JOIN album "
                     f"NATURAL JOIN artista "
                     f"NATURAL JOIN playlist_musica "
                     f"WHERE id_playlist = {playlist[0]}")
+        playlist_musics = cur.fetchall()
 
-        print(f"Playlist: {playlist[1]}")
+        cur.execute(f"SELECT SUM(duracao) FROM playlist "
+                    f"NATURAL JOIN playlist_musica "
+                    f"NATURAL JOIN musica "
+                    f"WHERE id_playlist = {playlist[0]} "
+                    f"GROUP BY id_playlist")
+        playlist_duration = cur.fetchone()
 
-        musics = cur.fetchall()
-
-        print(musics)
-
-        for music in musics:
-            print(f"Music: {music[0]} | Album: {music[1]} | Artist: {music[2]}")
+        print(f"Playlist: {playlist[1]} - Duration: {timedelta(seconds=playlist_duration[0])}")
+        for music in playlist_musics:
+            print(f"|----- Music: {music[0]} | Album: {music[1]} | Artist: {music[2]}")
         print("\n")
+        input("Press enter to continue...")
+
+
 
