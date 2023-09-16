@@ -19,18 +19,19 @@ def musics_not_in_playlist(cur, id_playlist):
 
 
 def add_music_playlist(cur, conn, current_user):
-    playlist_name = input("Insert playlist name: ")
-    cur.execute(
-        f"SELECT * FROM playlist WHERE nome_playlist = '{playlist_name}' AND email_usuario = '{current_user.email}'")
-    selected_playlist = cur.fetchone()
+    while True:
+        playlist_name = input("Insert playlist name: ")
+        cur.execute(
+            f"SELECT * FROM playlist WHERE nome_playlist = '{playlist_name}' AND email_usuario = '{current_user.email}'")
+        selected_playlist = cur.fetchone()
 
-    if selected_playlist is None:
-        print("Playlist not found!")
-        return
+        if selected_playlist is None:
+            print("Playlist not found!")
+            continue
 
     music_index = 1
     while music_index >= 0:
-        musics = musics_not_in_playlist(cur, selected_playlist[0])
+        musics = query.musics_not_in_playlist(cur, selected_playlist[0])
         print("Avaialable musics: ")
         print("Index - Music name | Album name | Artist name")
         print("-1 - Done")
@@ -47,3 +48,4 @@ def add_music_playlist(cur, conn, current_user):
 
         cur.execute(f"INSERT INTO playlist_musica VALUES({musics[music_index][0]}, {selected_playlist[0]})")
         conn.commit()
+        print("Music added successfully!")
