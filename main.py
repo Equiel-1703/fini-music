@@ -58,37 +58,21 @@ while True:
             print("Login successful!")
             break
     elif option == "2":
-        print("------------------ADD MUSIC TO PLAYLIST------------------")
+        print("------------------USER REGISTER------------------")
+        email = input("Insert email: ")
+        name = input("Insert name: ")
+        password = input("Insert password: ")
 
-        playlist_name = input("Insert playlist name: ")
-        cur.execute(
-            f"SELECT * FROM playlist WHERE nome_playlist = '{playlist_name}' AND email_usuario = '{current_user.email}'")
-        selected_playlist = cur.fetchone()
+        current_user = User(name, email, password)
 
-        if selected_playlist is None:
-            print("Playlist not found!")
-            continue
-
-        music_index = 1
-        while music_index >= 0:
-            musics = query.musics_not_in_playlist(cur, selected_playlist[0])
-            print("Avaialable musics: ")
-            print("Index - Music name | Album name | Artist name")
-            print("-1 - Done")
-            for i, music in enumerate(musics):
-                print(f"{i} - {music[1]} | {music[2]} | {music[3]}")
-
-            music_index = int(input("Insert music index: "))
-            if music_index < -1 or music_index >= len(musics):
-                print("Invalid index!")
-                continue
-            elif music_index == -1:
-                print("Done!")
-                break
-
-            cur.execute(f"INSERT INTO playlist_musica VALUES({musics[music_index][0]}, {selected_playlist[0]})")
+        cur.execute(f"SELECT * FROM usuario WHERE email_usuario = '{email}'")
+        if cur.fetchone() is not None:
+            print("Email already registered!")
+        else:
+            cur.execute(f"INSERT INTO usuario VALUES {current_user.sql_format()}")
             conn.commit()
-            print("Music added successfully!")
+            print("Register successful!")
+            break
     elif option == "3":
         exit()
     else:
@@ -121,33 +105,34 @@ while True:
         print("------------------ADD MUSIC TO PLAYLIST------------------")
 
         playlist_name = input("Insert playlist name: ")
-        cur.execute(f"SELECT * FROM playlist WHERE nome_playlist = '{playlist_name}' AND email_usuario = '{current_user.email}'")
+        cur.execute(
+            f"SELECT * FROM playlist WHERE nome_playlist = '{playlist_name}' AND email_usuario = '{current_user.email}'")
         selected_playlist = cur.fetchone()
 
         if selected_playlist is None:
             print("Playlist not found!")
             continue
 
-        cur.execute(f"SELECT id_musica, nome_musica, nome_album, nome_artista FROM musica "
-                    f"NATURAL JOIN album "
-                    f"NATURAL JOIN artista "
-                    f"WHERE id_musica NOT IN(SELECT id_musica FROM playlist_musica WHERE id_playlist = {selected_playlist[0]})")
+        music_index = 1
+        while music_index >= 0:
+            musics = query.musics_not_in_playlist(cur, selected_playlist[0])
+            print("Avaialable musics: ")
+            print("Index - Music name | Album name | Artist name")
+            print("-1 - Done")
+            for i, music in enumerate(musics):
+                print(f"{i} - {music[1]} | {music[2]} | {music[3]}")
 
-        musics = cur.fetchall()
+            music_index = int(input("Insert music index: "))
+            if music_index < -1 or music_index >= len(musics):
+                print("Invalid index!")
+                continue
+            elif music_index == -1:
+                print("Done!")
+                break
 
-        print("Avaialable musics: ")
-        print("Index - Music name | Album name | Artist name")
-        for i, music in enumerate(musics):
-            print(f"{i} - {music[1]} | {music[2]} | {music[3]}")
-
-        music_index = int(input("Insert music index: "))
-        if music_index < 0 or music_index >= len(musics):
-            print("Invalid index!")
-            continue
-
-        cur.execute(f"INSERT INTO playlist_musica VALUES({musics[music_index][0]}, {selected_playlist[0]})")
-        conn.commit()
-        print("Music added successfully!")
+            cur.execute(f"INSERT INTO playlist_musica VALUES({musics[music_index][0]}, {selected_playlist[0]})")
+            conn.commit()
+            print("Music added successfully!")
 
 
 
