@@ -92,33 +92,39 @@ while True:
     print("3 - Remove music from playlist")
     print("4 - Delete playlist")
     print("5 - Show playlists musics")
-    print("6 - Exit")
+    print("6 - Filter musics in playlists")
+    print("7 - Play music")
+    print("0 - Exit")
     option = input("Choose an option: ")
     print("\n" * 100)
 
     if option == "1":
         print("------------------CREATE PLAYLIST------------------")
         query.create_playlist(cur, conn, current_user)
-        print("Playlist created successfully!")
 
     elif option == "2":
         print("------------------ADD MUSIC TO PLAYLIST------------------")
         query.add_music_playlist(cur, conn, current_user)
-        print("Music added successfully!")
 
     elif option == "3":
         print("------------------REMOVE MUSIC FROM PLAYLIST------------------")
         query.remove_music_playlist(cur, conn, current_user)
-        print("Music removed successfully!")
 
     elif option == "4":
         print("------------------DELETE PLAYLIST------------------")
         query.delete_playlist(cur, conn, current_user)
-        print("Playlist deleted successfully!")
 
     elif option == "5":
         print(f"------------------{current_user.name}'s PLAYLISTS------------------")
         query.show_playlists_musics(cur, current_user)
 
     elif option == "6":
+        print("------------------FILTER MUSICS------------------")
+        query.filtered_search(cur, current_user)
+
+    elif option == "7":
+        print("------------------PLAY MUSIC------------------")
+        query.play_music(cur, conn, current_user)
+
+    elif option == "0":
         exit()
