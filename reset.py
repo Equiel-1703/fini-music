@@ -1,4 +1,4 @@
-from binascii import hexlify
+
 
 def __drop_schema(cur):
     cur.execute("DROP SCHEMA IF EXISTS public CASCADE")
@@ -76,8 +76,8 @@ def __create_tables(cur):
 def __get_mp3_binary_for_sql(mp3_file_path):
     return f"'\\x{open(mp3_file_path, 'rb').read().hex()}'::bytea"
 
-def __insert_values(cur):
 
+def __insert_values(cur):
     cur.execute("INSERT INTO artista (nome_artista, descricao) VALUES"
                 "('System of a Down', 'System of a Down eh uma banda de metal.'),"
                 "('Linkin Park', 'Linkin Park eh uma banda de rock.'),"
@@ -110,13 +110,13 @@ def __insert_values(cur):
                 f"('brutal', 143, 8, {__get_mp3_binary_for_sql('musics/brutal.mp3')})")
 
     cur.execute("INSERT INTO genero (nome_genero) VALUES"
-                "('Rock')," # 1
-                "('Metal')," # 2
-                "('Rap')," # 3
-                "('Hip-Hop')," # 4
-                "('Pop')," # 5
-                "('Indie')," # 6
-                "('Grunge')") #7
+                "('Rock'),"  # 1
+                "('Metal'),"  # 2
+                "('Rap'),"  # 3
+                "('Hip-Hop'),"  # 4
+                "('Pop'),"  # 5
+                "('Indie'),"  # 6
+                "('Grunge')")  # 7
 
     cur.execute("INSERT INTO genero_musica (id_genero,id_musica) VALUES"
                 "(1, 1),"
