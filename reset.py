@@ -1,3 +1,5 @@
+from binascii import hexlify
+
 def __drop_schema(cur):
     cur.execute("DROP SCHEMA IF EXISTS public CASCADE")
 
@@ -43,6 +45,7 @@ def __create_tables(cur):
                 "visualizacoes integer default 0 not null,"
                 "id_album integer,"
                 "duracao integer not null,"
+                "file bytea,"
                 "PRIMARY KEY (id_musica),"
                 "FOREIGN KEY (id_album) REFERENCES album(id_album) )")
     print("Table musica created successfully in PostgreSQL")
@@ -70,6 +73,9 @@ def __create_tables(cur):
     print("Table playlist_musica created successfully in PostgreSQL")
 
 
+def __get_mp3_binary_for_sql(mp3_file_path):
+    return f"'\\x{open(mp3_file_path, 'rb').read().hex()}'::bytea"
+
 def __insert_values(cur):
 
     cur.execute("INSERT INTO artista (nome_artista, descricao) VALUES"
@@ -89,19 +95,19 @@ def __insert_values(cur):
                 "('The Real Slim Shady LP', null, 4),"
                 "('Sour', null, 5)")
 
-    cur.execute("INSERT INTO musica (nome_musica, duracao, id_album) VALUES"
-                "('Chop Suey', 209, 1),"
-                "('Aerials', 244, 1),"
-                "('Lost in Hollywood', 323, 2),"
-                "('In The End', 218, 3),"
-                "('Numb', 187, 4),"
-                "('Crawling', 216, 3),"
-                "('Smells Like Teen Spirit', 278, 5),"
-                "('Heart-Shaped Box', 282, 6),"
-                "('Come As You Are', 224, 5),"
-                "('My Name Is', 268, 7),"
-                "('good 4 u', 178, 8),"
-                "('brutal', 143, 8)")
+    cur.execute("INSERT INTO musica (nome_musica, duracao, id_album, file) VALUES"
+                f"('Chop Suey', 209, 1, {__get_mp3_binary_for_sql('musics/chop_suey.mp3')}),"
+                f"('Aerials', 244, 1, {__get_mp3_binary_for_sql('musics/aerials.mp3')}),"
+                f"('Lost in Hollywood', 323, 2, {__get_mp3_binary_for_sql('musics/lost_in_hollywood.mp3')}),"
+                f"('In The End', 218, 3, {__get_mp3_binary_for_sql('musics/in_the_end.mp3')}),"
+                f"('Numb', 187, 4, {__get_mp3_binary_for_sql('musics/numb.mp3')}),"
+                f"('Crawling', 216, 3, {__get_mp3_binary_for_sql('musics/crawling.mp3')}),"
+                f"('Smells Like Teen Spirit', 278, 5, {__get_mp3_binary_for_sql('musics/smells_like_teen_spirit.mp3')}),"
+                f"('Heart-Shaped Box', 282, 6, {__get_mp3_binary_for_sql('musics/heart_shaped_box.mp3')}),"
+                f"('Come As You Are', 224, 5, {__get_mp3_binary_for_sql('musics/come_as_you_are.mp3')}),"
+                f"('My Name Is', 268, 7, {__get_mp3_binary_for_sql('musics/my_name_is.mp3')}),"
+                f"('good 4 u', 178, 8, {__get_mp3_binary_for_sql('musics/good_4_u.mp3')}),"
+                f"('brutal', 143, 8, {__get_mp3_binary_for_sql('musics/brutal.mp3')})")
 
     cur.execute("INSERT INTO genero (nome_genero) VALUES"
                 "('Rock')," # 1

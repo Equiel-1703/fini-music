@@ -1,4 +1,8 @@
 from datetime import timedelta
+import psycopg2
+import pydub
+from pydub.playback import _play_with_simpleaudio as play
+import io
 
 
 def create_playlist(cur, conn, current_user):
@@ -23,6 +27,15 @@ def musics_not_in_playlist(cur, id_playlist):
 
 def musics_in_playlist(cur, id_playlist):
     cur.execute(f"SELECT id_musica, nome_musica, nome_album, nome_artista, visualizacoes FROM musica "
+                f"NATURAL JOIN album "
+                f"NATURAL JOIN artista "
+                f"WHERE id_musica IN(SELECT id_musica FROM playlist_musica WHERE id_playlist = {id_playlist})"
+                f"ORDER BY visualizacoes DESC, nome_musica ASC")
+    return cur.fetchall()
+
+
+def musics_in_playlist_with_file(cur, id_playlist):
+    cur.execute(f"SELECT id_musica, nome_musica, nome_album, nome_artista, visualizacoes, file FROM musica "
                 f"NATURAL JOIN album "
                 f"NATURAL JOIN artista "
                 f"WHERE id_musica IN(SELECT id_musica FROM playlist_musica WHERE id_playlist = {id_playlist})"
@@ -221,7 +234,7 @@ def play_music(cur, conn, current_user):
         print("Invalid index!")
         return
 
-    playlist_musics = musics_in_playlist(cur, user_playlists[playlist_index][0])
+    playlist_musics = musics_in_playlist_with_file(cur, user_playlists[playlist_index][0])
 
     print("Choose music to play: ")
     for i, music in enumerate(playlist_musics):
@@ -232,11 +245,27 @@ def play_music(cur, conn, current_user):
         print("Invalid index!")
         return
 
-    cur.execute(f"UPDATE musica SET visualizacoes = visualizacoes + 1 "
-                f"WHERE id_musica = {playlist_musics[music_index][0]}")
-    conn.commit()
     music_name = playlist_musics[music_index][1]
+    music_file = (playlist_musics[music_index][5]).tobytes()
 
-    print(f"Playing {music_name}...")
-    print("\n")
-    input("Press enter to continue...")
+    keep_playing = True
+    while keep_playing:
+        cur.execute(f"UPDATE musica SET visualizacoes = visualizacoes + 1 "
+                    f"WHERE id_musica = {playlist_musics[music_index][0]}")
+        conn.commit()
+
+        print(f"Playing now {music_name}...")
+        song = pydub.AudioSegment.from_file(io.BytesIO(music_file), format="mp3")
+        playback = play(song)
+
+        choice = 0
+        while choice != "q" and choice != "n":
+            choice = input("Press q to quit or n to next music...")
+            if choice == "q":
+                playback.stop()
+                keep_playing = False
+            elif choice == "n":
+                playback.stop()
+                music_index = (music_index + 1) % len(playlist_musics)
+                music_name = playlist_musics[music_index][1]
+                music_file = (playlist_musics[music_index][5]).tobytes()
